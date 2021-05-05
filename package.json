@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.1.5",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",
     "@zeit/next-sass": "^1.0.1",
