@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { css } from "@emotion/react";
 import { Form, Button, Slider, Radio, Space } from "antd";
 import { actions } from "../modules/redux";
+import { useLoading } from "../hooks";
 
 interface Props {}
 
@@ -14,24 +15,35 @@ const OptimizerForm: React.FC<Props> = (props) => {
 interface IProps {}
 
 interface FormValues {
-  type: string;
+  optimizeType: "single" | "local" | "global";
   percentile: number;
 }
 
 const Component: React.FC<IProps> = (props) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const { loading, setLoading } = useLoading();
 
   const handleSubmit = useCallback(
     (formValues: FormValues) => {
-      const { type: optimizeType, percentile } = formValues;
+      setLoading(true);
+      const { optimizeType, percentile } = formValues;
       dispatch(actions.updatePercentile(percentile));
+      switch (optimizeType) {
+        case "single":
+          break;
+        case "local":
+          break;
+        case "global":
+          break;
+      }
+      setLoading(false);
     },
     [dispatch]
   );
 
   const handleReset = useCallback(() => {
-    dispatch(actions.updateSelectedPoints([]));
+    dispatch(actions.resetSelectedPoints([]));
   }, [dispatch]);
 
   return (
@@ -40,11 +52,16 @@ const Component: React.FC<IProps> = (props) => {
         form={form}
         css={FormStyle}
         initialValues={{
-          ["type"]: "single",
+          ["optimizeType"]: "single",
+          ["percentile"]: 1,
         }}
         onFinish={handleSubmit}
       >
-        <Form.Item name="type" labelCol={{ span: 24 }} label="optimize type">
+        <Form.Item
+          name="optimizeType"
+          labelCol={{ span: 24 }}
+          label="optimize type"
+        >
           <Radio.Group>
             <Space direction="vertical">
               <Radio value="single">Single</Radio>
@@ -57,7 +74,7 @@ const Component: React.FC<IProps> = (props) => {
           <Slider min={1} max={100} />
         </Form.Item>
         <Form.Item>
-          <Button htmlType="submit" type="primary">
+          <Button htmlType="submit" type="primary" loading={loading}>
             Optimize
           </Button>
         </Form.Item>

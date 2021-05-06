@@ -5,9 +5,15 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface Data {}
 
-export interface Points {}
+export interface Point {
+  x: number;
+  y: number;
+  v: number;
+}
+export type Points = Point[];
 
-export interface SelectedPoints {}
+export type SelectedPoint = number;
+export type SelectedPoints = SelectedPoint[];
 
 export interface AppState {
   data: Data;
@@ -22,14 +28,16 @@ const create = actionCreatorFactory();
 const updateData = create<Data>("UPDATE_DATA");
 const updatePoints = create<Points>("UPDATE_POINTS");
 const updateAnchors = create<string[]>("UPDATE_ANCHORS");
-const updateSelectedPoints = create<SelectedPoints>("UPDATE_SELECTED_POINTS");
+const addSelectedPoints = create<SelectedPoint>("ADD_SELECTED_POINTS");
+const resetSelectedPoints = create<SelectedPoints>("RESET_SELECTED_POINTS");
 const updatePercentile = create<number>("UPDATE_PERCENTILE");
 
 export const actions = {
   updateData,
   updatePoints,
   updateAnchors,
-  updateSelectedPoints,
+  addSelectedPoints,
+  resetSelectedPoints,
   updatePercentile,
 };
 
@@ -51,11 +59,15 @@ const reducer = reducerWithInitialState(initalState)
   .case(actions.updateAnchors, (state, anchors) => {
     return { ...state, anchors };
   })
-  .case(actions.updateSelectedPoints, (state, selectedPoints) => {
+  .case(actions.addSelectedPoints, (state, selectedPoint) => {
+    const newState = [...state.selectedPoints, selectedPoint];
+    return { ...state, selectedPoints: newState };
+  })
+  .case(actions.resetSelectedPoints, (state, selectedPoints) => {
     return { ...state, selectedPoints };
   })
-  .case(actions.updatePercentile, (state, pecentile) => {
-    return { ...state, pecentile };
+  .case(actions.updatePercentile, (state, percentile) => {
+    return { ...state, percentile };
   })
   .build();
 
