@@ -18,7 +18,7 @@ const { Sider } = Layout;
 
 const Component: React.FC<IProps> = (props) => {
   return (
-    <Sider css={SiderStyle} width={"20%"}>
+    <Sider css={SiderStyle} width={"240px"}>
       <OptimizerForm />
     </Sider>
   );
