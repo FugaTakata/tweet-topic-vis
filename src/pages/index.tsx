@@ -1,28 +1,28 @@
-import React, { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { actions, AppState } from "../modules/redux";
-
+/** @jsxImportSource @emotion/react */
+import React from "react";
+import { css } from "@emotion/react";
 import Layout from "../components/layout";
-import { Button } from "antd";
+import Radviz from "../components/radviz";
+import { Card, Layout as AntLayout } from "antd";
+import RadvizWrapper from "../components/radviz-wrapper";
 
 interface Props {}
 
+const { Sider } = AntLayout;
+
 const Home: React.FC<Props> = (props) => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const loadData = async () => {
-      const response = await fetch("data/data.json");
-      const data = await response.json();
-
-      dispatch(actions.updateData(data));
-    };
-    loadData();
-  }, [dispatch]);
-
   return (
     <React.Fragment>
-      <Layout>hello world</Layout>
+      <AntLayout>
+        <Layout>
+          {/* <div css={RadvizWrapperStyle}> */}
+          <RadvizWrapper>
+            <Radviz />
+          </RadvizWrapper>
+          {/* </div> */}
+        </Layout>
+        {/* <Sider></Sider> */}
+      </AntLayout>
     </React.Fragment>
   );
 };

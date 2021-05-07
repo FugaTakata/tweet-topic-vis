@@ -1,10 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import React, { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { css } from "@emotion/react";
 import { Form, Button, Slider, Radio, Space } from "antd";
 import { actions } from "../modules/redux";
 import { useLoading } from "../hooks";
+import { globalOptimize, localOptimize, singleOptimize } from "../lib";
+import { AppState } from "../models";
 
 interface Props {}
 
@@ -21,29 +23,54 @@ interface FormValues {
 
 const Component: React.FC<IProps> = (props) => {
   const dispatch = useDispatch();
+  const { data, anchors, r, selectedPoints } = useSelector(
+    (state: AppState) => state
+  );
   const [form] = Form.useForm();
   const { loading, setLoading } = useLoading();
 
-  const handleSubmit = useCallback(
-    (formValues: FormValues) => {
-      setLoading(true);
-      const { optimizeType, percentile } = formValues;
-      dispatch(actions.updatePercentile(percentile));
+  const handleSubmit = (formValues: FormValues) => {
+    setLoading(true);
+    const { optimizeType, percentile } = formValues;
+    // dispatch(actions.updatePercentile(percentile));
+    let newAnchors;
+    try {
       switch (optimizeType) {
         case "single":
+          console.log(selectedPoints);
+          newAnchors = singleOptimize({
+            data,
+            anchors,
+            selectedPoint: selectedPoints[selectedPoints.length - 1],
+          });
+          dispatch(actions.updateAnchors(newAnchors));
           break;
         case "local":
+          newAnchors = localOptimize({
+            data,
+            anchors,
+            percentile,
+            r,
+            selectedPoints,
+          });
+          dispatch(actions.updateAnchors(newAnchors));
           break;
         case "global":
+          newAnchors = globalOptimize({ data, anchors, percentile, r });
+          dispatch(actions.updateAnchors(newAnchors));
           break;
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoading(false);
-    },
-    [dispatch]
-  );
+    }
+  };
 
   const handleReset = useCallback(() => {
-    dispatch(actions.resetSelectedPoints([]));
+    // @ts-ignore
+    // todo action type
+    dispatch(actions.resetSelectedPoints());
   }, [dispatch]);
 
   return (
@@ -52,7 +79,7 @@ const Component: React.FC<IProps> = (props) => {
         form={form}
         css={FormStyle}
         initialValues={{
-          ["optimizeType"]: "single",
+          ["optimizeType"]: "global",
           ["percentile"]: 1,
         }}
         onFinish={handleSubmit}
@@ -64,9 +91,13 @@ const Component: React.FC<IProps> = (props) => {
         >
           <Radio.Group>
             <Space direction="vertical">
-              <Radio value="single">Single</Radio>
-              <Radio value="local">Local</Radio>
               <Radio value="global">Global</Radio>
+              <Radio value="single" disabled={selectedPoints.length === 0}>
+                Single
+              </Radio>
+              <Radio value="local" disabled={selectedPoints.length === 0}>
+                Local
+              </Radio>
             </Space>
           </Radio.Group>
         </Form.Item>

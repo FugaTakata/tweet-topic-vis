@@ -14,16 +14,10 @@ const Layout: React.FC<Props> = ({ children }) => {
     <React.Fragment>
       <AntLayout>
         <SideMenu />
-        <Content>
-          <div css={ContentStyle}>{children}</div>
-        </Content>
+        <Content>{children}</Content>
       </AntLayout>
     </React.Fragment>
   );
 };
-
-const ContentStyle = css`
-  background-color: "#fff";
-`;
 
 export default Layout;
